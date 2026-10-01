@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mis XV Años — Letycia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF8F3; --blush:#F8E1E7; --rose:#D98BA6; --gold:#C9A24B;
+    --burgundy:#5C2A3A; --sage:#8FAE8B; --paper:#FFFDFB;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit}
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  html,body{height:100%;margin:0;background:var(--blush);overflow:hidden}
+  body{
+    font-family:'Cormorant Garamond',serif;
+    color:var(--burgundy);
+    display:flex; align-items:center; justify-content:center;
+    min-height:100%;
+  }
+  .stage{position:relative; width:100%; height:100vh; height:100dvh; overflow:hidden}
+
+  /* ---------- Sobre ---------- */
+  #envelope-screen{
+    position:absolute; inset:0; z-index:20;
+    display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(ellipse at center, #fdf0f3 0%, var(--blush) 65%, #f0c9d4 100%);
+    transition:opacity .9s ease, visibility .9s;
+  }
+  #envelope-screen.hidden{opacity:0; visibility:hidden; pointer-events:none}
+  .envelope{
+    position:relative; width:min(78vw,360px); aspect-ratio:3/2;
+    perspective:1200px;
+  }
+  .env-body{
+    position:absolute; inset:0; border-radius:6px;
+    background:linear-gradient(180deg,#fff,#fdf4f6);
+    box-shadow:0 18px 40px rgba(92,42,58,.25);
+    border:1px solid #eccdd6;
+  }
+  .env-pocket{
+    position:absolute; left:0; right:0; bottom:0; height:64%;
+    background:linear-gradient(145deg,#fbe7ec,#f6d4dd);
+    clip-path:polygon(0 0,50% 42%,100% 0,100% 100%,0 100%);
+    border-radius:0 0 6px 6px;
+    z-index:2;
+  }
+  .env-flap{
+    position:absolute; top:0; left:0; right:0; height:58%;
+    background:linear-gradient(135deg,#f4c9d4,#eeb3c3);
+    clip-path:polygon(0 0,100% 0,50% 92%);
+    transform-origin:top center; transform-style:preserve-3d;
+    transition:transform 1s cubic-bezier(.6,0,.3,1);
+    z-index:3; border-radius:6px 6px 0 0;
+  }
+  .envelope.open .env-flap{ transform:rotateX(180deg); z-index:1 }
+  .env-seal{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:64px; height:64px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #e7c377, var(--gold));
+    display:flex; align-items:center; justify-content:center;
+    color:#fff8e8; font-family:'Great Vibes',cursive; font-size:28px;
+    box-shadow:0 4px 10px rgba(0,0,0,.25); z-index:4;
+    transition:opacity .4s, transform .4s;
+  }
+  .envelope.open .env-seal{opacity:0; transform:translate(-50%,-50%) scale(.6)}
+  #open-btn{
+    position:absolute; bottom:-62px; left:50%; transform:translateX(-50%);
+    background:var(--burgundy); color:#fff8f3; border:none;
+    font-family:'Cormorant Garamond',serif; font-weight:600; letter-spacing:.14em;
+    font-size:15px; padding:12px 34px; border-radius:30px; cursor:pointer;
+    box-shadow:0 8px 18px rgba(92,42,58,.3);
+    transition:transform .25s, background .25s;
+  }
+  #open-btn:hover{transform:translateX(-50%) scale(1.05); background:#4a2130}
+  #open-btn:focus-visible{outline:3px solid var(--gold); outline-offset:3px}
+  .env-hint{
+    position:absolute; bottom:-102px; left:50%; transform:translateX(-50%);
+    font-size:13px; color:#8a5566; letter-spacing:.04em; white-space:nowrap;
+  }
+
+  /* ---------- Invitación ---------- */
+  #invite{
+    position:absolute; inset:0; z-index:10;
+    display:flex; align-items:center; justify-content:center;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+    background:linear-gradient(180deg,#fdf5f3,var(--blush));
+    padding:28px 14px 36px;
+  }
+  .card{
+    position:relative; width:min(92vw,460px);
+    background:var(--paper);
+    border:1px solid #f0d3dc;
+    border-radius:4px;
+    box-shadow:0 20px 50px rgba(92,42,58,.18);
+    padding:40px 26px 34px;
+    text-align:center;
+    opacity:0; transform:translateY(26px) scale(.97);
+    transition:opacity .9s ease, transform .9s ease;
+  }
+  #invite.show .card{opacity:1; transform:translateY(0) scale(1)}
+  .corner{position:absolute; font-size:30px; opacity:.85; filter:saturate(1.05)}
+  .corner.tl{top:8px; left:10px; transform:rotate(-12deg)}
+  .corner.tr{top:8px; right:10px; transform:rotate(12deg) scaleX(-1)}
+  .corner.bl{bottom:8px; left:10px; transform:rotate(12deg)}
+  .corner.br{bottom:8px; right:10px; transform:rotate(-12deg) scaleX(-1)}
+  .crown{font-size:34px; display:block; margin-bottom:6px; color:var(--gold)}
+  .quote{font-style:italic; font-size:16.5px; line-height:1.55; color:#7a4a58; margin:4px 10px 18px}
+  .title{
+    font-family:'Great Vibes',cursive; font-size:52px; color:var(--burgundy);
+    margin:4px 0 14px; line-height:1;
+  }
+  .name{
+    font-size:18px; letter-spacing:.06em; color:var(--rose);
+    font-weight:600; margin:0 0 20px; font-style:italic;
+  }
+  .butterfly{font-size:20px; margin:0 8px}
+  .datetime{font-size:21px; margin:10px 0 22px; color:var(--burgundy)}
+  .datetime .time{display:block; font-size:16px; color:#8a5566; margin-top:2px}
+  .divider{width:70px; height:1px; background:var(--gold); margin:20px auto; opacity:.6}
+  .venues{display:flex; gap:18px; text-align:left; margin-top:4px}
+  .venue{flex:1}
+  .venue h3{
+    font-family:'Cormorant Garamond',serif; font-size:14px; letter-spacing:.12em;
+    color:var(--rose); margin:0 0 6px; font-weight:600;
+  }
+  .venue p{margin:0; font-size:14px; line-height:1.5; color:#5c2a3a}
+  #sound-toggle{
+    position:fixed; bottom:16px; right:16px; z-index:30;
+    width:46px; height:46px; border-radius:50%; border:1px solid #e9c3cf;
+    background:#fff; color:var(--burgundy); font-size:18px; cursor:pointer;
+    box-shadow:0 6px 16px rgba(92,42,58,.22);
+    display:flex; align-items:center; justify-content:center;
+  }
+  #sound-toggle:focus-visible{outline:3px solid var(--gold); outline-offset:2px}
+
+  @media (max-width:380px){
+    .title{font-size:42px}
+    .card{padding:34px 18px 28px}
+    .venues{flex-direction:column; gap:14px}
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div id="invite">
+    <div class="card">
+      <span class="corner tl">🌸</span>
+      <span class="corner tr">🌸</span>
+      <span class="corner bl">🌹</span>
+      <span class="corner br">🌹</span>
+      <span class="crown">👑</span>
+      <p class="quote">Hay momentos inolvidables que se atesoran en el corazón para siempre.<br>Por eso quiero que compartas conmigo este día tan especial.</p>
+      <h1 class="title">Mis XV Años</h1>
+      <p class="name">Letycia Elizabeth Tashiguano Proaño</p>
+      <p class="datetime">🦋 17 de octubre 🦋<span class="time">18:00 h.</span></p>
+      <div class="divider"></div>
+      <div class="venues">
+        <div class="venue">
+          <h3>Iglesia</h3>
+          <p>Iglesia Nuestra Señora de El Quinche, Luis Toro Moreno y Sánchez y Cifuentes</p>
+        </div>
+        <div class="venue">
+          <h3>Recepción</h3>
+          <p>Complejo Barrial Pilanqui del IESS, Carlos Elias Almeida y Avenida Fray Vacas Galindo</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="envelope-screen">
+    <div class="envelope" id="envelope">
+      <div class="env-body"></div>
+      <div class="env-pocket"></div>
+      <div class="env-flap"></div>
+      <div class="env-seal">L</div>
+      <button id="open-btn">Abrir</button>
+      <div class="env-hint">toca para descubrir la invitación</div>
+    </div>
+  </div>
+
+  <button id="sound-toggle" aria-label="Silenciar música" hidden>🔊</button>
+</div>
+
+<script>
+(function(){
+  // ---------- Melodía ambiental generada (sin archivos externos) ----------
+  var ctx=null, musicOn=false, timer=null, delay=null, feedback=null, master=null;
+  var scale=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25]; // pentatónica suave
+  function initAudio(){
+    if(ctx) return;
+    try{
+      ctx=new (window.AudioContext||window.webkitAudioContext)();
+      master=ctx.createGain(); master.gain.value=0.18;
+      delay=ctx.createDelay(); delay.delayTime.value=0.45;
+      feedback=ctx.createGain(); feedback.gain.value=0.3;
+      delay.connect(feedback); feedback.connect(delay);
+      master.connect(delay); delay.connect(ctx.destination);
+      master.connect(ctx.destination);
+    }catch(e){ ctx=null; }
+  }
+  function note(freq,start,dur){
+    if(!ctx) return;
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,start);
+    g.gain.linearRampToValueAtTime(0.5,start+0.18);
+    g.gain.exponentialRampToValueAtTime(0.0008,start+dur);
+    o.connect(g); g.connect(master);
+    o.start(start); o.stop(start+dur+0.1);
+  }
+  function loopMelody(){
+    if(!ctx||!musicOn) return;
+    var t=ctx.currentTime, step=0.95;
+    for(var i=0;i<8;i++){
+      var f=scale[Math.floor(Math.random()*scale.length)];
+      note(f, t+i*step, step*1.6);
+      if(i%3===0) note(f/2, t+i*step, step*2.2);
+    }
+    timer=setTimeout(loopMelody, 8*step*1000);
+  }
+  function startMusic(){
+    initAudio(); if(!ctx) return;
+    if(ctx.state==='suspended') ctx.resume();
+    musicOn=true; loopMelody();
+    document.getElementById('sound-toggle').hidden=false;
+    document.getElementById('sound-toggle').textContent='🔊';
+  }
+  function toggleMusic(){
+    if(!ctx) return;
+    musicOn=!musicOn;
+    document.getElementById('sound-toggle').textContent=musicOn?'🔊':'🔈';
+    if(musicOn){ ctx.resume(); loopMelody(); }
+    else{ clearTimeout(timer); }
+  }
+  document.getElementById('sound-toggle').addEventListener('click', toggleMusic);
+
+  // ---------- Apertura del sobre ----------
+  var opened=false;
+  document.getElementById('open-btn').addEventListener('click', function(){
+    if(opened) return; opened=true;
+    startMusic();
+    document.getElementById('envelope').classList.add('open');
+    setTimeout(function(){
+      document.getElementById('envelope-screen').classList.add('hidden');
+      document.getElementById('invite').classList.add('show');
+    }, 650);
+  });
+})();
+</script>
+</body>
+</html>
